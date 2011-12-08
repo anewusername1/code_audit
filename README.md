@@ -1,6 +1,6 @@
 I created these tools because I was tired of going through and using ack/sed/perl/whatever to replace RSpec code I didn't like.  
 ## bin/bad_rspec
-This bash script will help you fix several things:
+This bash script will help you fix several things:  
   1. It will prompt to replace 'should ==' with 'should eq($1)'
 
 
