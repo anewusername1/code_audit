@@ -1,6 +1,8 @@
 #!/bin/sh
-hash ack 2>&- || { echo >&2 "I require ack but it's not installed.  Aborting."; exit 1; }
-hash perl 2>&- || { echo >&2 "I require perl but it's not installed.  Aborting."; exit 1; }
+check_dependencies(){
+  hash grep 2>&- || { echo >&2 "I require grep but it's not installed.  Aborting."; exit 1; }
+  hash perl 2>&- || { echo >&2 "I require perl but it's not installed.  Aborting."; exit 1; }
+}
 
 # TODO: check that we're in a git repository. Warn and prompt to continue if we aren't
 # TODO: make this tell you when it found bad rspec code, what the code is, and prompt the user
@@ -14,7 +16,7 @@ hash perl 2>&- || { echo >&2 "I require perl but it's not installed.  Aborting."
 # }
 
 get_user_action() {
-  echo "\tWhat would you like to do to this issue? (works for 99% of the cases)\n\t\t(r)eplace, r(e)view, (i)gnore"
+  echo "\n\n\tWhat would you like to do to this issue? (works for 99% of the cases)\n\t\t(r)eplace, r(e)view, (i)gnore, (q)uit"
   read -n 1 answer
   case $answer in
     i)
@@ -23,8 +25,10 @@ get_user_action() {
       ;;
     e)
       ;;
+    q)
+      ;;
     *)
-      echo "\tIncorrect answer"
+      echo "\n\tIncorrect answer"
       get_user_action
       ;;
   esac
@@ -32,9 +36,10 @@ get_user_action() {
 
 check_bad_eq_eq(){
   answer="i"
-  should_eq_eq=`ack "should == "`
+  should_eq_eq=`find . -name '*_spec.rb' -exec grep -n "should ==" /dev/null {} \;`
+
   if [ -n "$should_eq_eq" ]; then
-    echo "\tYou're using \"should ==\" instead of \"should eq()\""
+    echo "\tYou're using \"should ==\" instead of \"should eq()\"\n"
     echo "\tThe only problem with this is that it doesn't conform to a good style of test writing"
     while :
     do
@@ -46,6 +51,9 @@ check_bad_eq_eq(){
         r)
           find . -name '*_spec.rb' -exec perl -pi -e 's/should ==[\s]+(.*)/should eq\($1\)/g' {} \;
           break
+          ;;
+        q)
+          exit 0
           ;;
         e)
           echo "$should_eq_eq"
@@ -60,6 +68,7 @@ check_bad_should_not(){
   echo "answer is $answer"
 }
 
+check_dependencies
 check_bad_eq_eq
 check_bad_should_not
 

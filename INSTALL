@@ -1,0 +1,4 @@
+To install these tools, simple link them to an appropriate bin directory
+
+Alternatively, you can modify this line and add it to your .profile
+export PATH=(path_to_refactor_tools)/bin:$PATH
