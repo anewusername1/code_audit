@@ -15,26 +15,15 @@ def help
 end
 
 def check_git
-  git_info = %x{git status}
-  raise 'git status is blank' if(git_info == '')
-  if(git_info =~ /fatal: Not a git repository/)
+  git_info = %x{([ -d .git ] && echo .git) || git rev-parse --git-dir 2> /dev/null}
+  if(git_info == '')
     puts 'WARNING: you are not in a git repository.'
     puts "\tIf you're using some version control system other than git, ignore this message"
     puts "\tIf you're not using version control, think twice before running this app"
     puts "\tTurn this message off with '--debug-level NONE'"
-    puts "\tContinue? [Y/n]"
-    while(1)
-      answer = gets
-      case answer
-      when /y/i
-        break
-      when /n/i
-        exit 1
-      else
-        puts "\tUnknown answer"
-        puts "\tContinue? [Y/n]"
-      end
-    end
+    puts "\tContinuing in "
+    5.downto(1) {|i| sleep 1; puts "#{i}.."}
+    puts
   end
 end
 
