@@ -49,6 +49,7 @@ check_bad_eq_eq(){
           break
           ;;
         r)
+          # replace instances of should == with should eq(.*)
           find . -name '*_spec.rb' -exec perl -pi -e 's/should ==[\s]+(.*)/should eq\($1\)/g' {} \;
           break
           ;;
@@ -63,9 +64,39 @@ check_bad_eq_eq(){
   fi
 }
 
+# check_no_parens(){
+  # TODO: look for common places where parenthesis are left out and add them back in
+  # perl -pi -e 's/eq (.*)/eq\($1\)/g'
+# }
+
 check_bad_should_not(){
   answer="i"
-  echo "answer is $answer"
+  should_eq_eq=`find . -name '*_spec.rb' -exec grep -n "should_not ==" /dev/null {} \;`
+
+  if [ -n "$should_eq_eq" ]; then
+    echo "\tYou're using \"should_not ==\" instead of \"should_not eq()\"\n"
+    echo "\tThe only problem with this is that it doesn't conform to a good style of test writing"
+    while :
+    do
+      get_user_action
+      case $answer in
+        i)
+          break
+          ;;
+        r)
+          # replace instances of should_not == with should eq(.*)
+          find . -name '*_spec.rb' -exec perl -pi -e 's/should_not ==[\s]+(.*)/should_not eq\($1\)/g' {} \;
+          break
+          ;;
+        q)
+          exit 0
+          ;;
+        e)
+          echo "$should_eq_eq"
+          ;;
+      esac
+    done
+  fi
 }
 
 check_dependencies
