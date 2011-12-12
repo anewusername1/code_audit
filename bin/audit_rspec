@@ -1,0 +1,81 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require File.expand_path(File.join(File.dirname(__FILE__), '..', 'rspec', 'rspec'))
+
+module DebugLevels
+  NONE = 0
+  WARN = 1
+  ERR  = 2
+end
+
+def help
+  puts 'Audit your code'
+  puts "  -r, --auto-repalce\tautomatically replace found occurences"
+end
+
+def check_git
+  git_info = %x{git status}
+  raise 'git status is blank' if(git_info == '')
+  if(git_info =~ /fatal: Not a git repository/)
+    puts 'WARNING: you are not in a git repository.'
+    puts "\tIf you're using some version control system other than git, ignore this message"
+    puts "\tIf you're not using version control, think twice before running this app"
+    puts "\tTurn this message off with '--debug-level NONE'"
+    puts "\tContinue? [Y/n]"
+    while(1)
+      answer = gets
+      case answer
+      when /y/i
+        break
+      when /n/i
+        exit 1
+      else
+        puts "\tUnknown answer"
+        puts "\tContinue? [Y/n]"
+      end
+    end
+  end
+end
+
+options = {}
+optparse = OptionParser.new do |opts|
+  opts.banner = "Usage: #{__FILE__} [options]"
+  options[:verbose] = false
+  opts.on('-v', '--verbose', 'Verbose logging') do
+    options[:verbose] = true
+  end
+
+  options[:auto_replace] = false
+  opts.on('-r', '--auto-replace', 'Automatically replace problem code') do
+    options[:auto_replace] = true
+  end
+
+  options[:debug_level] = DebugLevels::WARN
+  opts.on('-d', '--debug-level NONE|WARN|ERR', 'Set the debug level') do |level|
+    case level
+    when 'NONE'
+      options[:debug_level] = DebugLevels::NONE
+    when 'WARN'
+      options[:debug_level] = DebugLevels::WARN
+    when 'ERR'
+      options[:debug_level] = DebugLevels::ERR
+    else
+      puts 'Unknown debug level'
+      exit 1
+    end
+  end
+
+  opts.on('-h', '--help', 'Print help and exit') do
+    puts opts
+    exit
+  end
+end
+
+optparse.parse!
+if(options[:debug_level] > DebugLevels::NONE)
+  check_git
+end
+
+audit_rspec = Rspec.new(options)
+audit_rspec.start
