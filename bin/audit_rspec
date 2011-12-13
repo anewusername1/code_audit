@@ -40,6 +40,11 @@ optparse = OptionParser.new do |opts|
     options[:auto_replace] = true
   end
 
+  options[:pass_or_fail] = false
+  opts.on('-c', '--check', 'Return Pass or Fail') do
+    options[:pass_or_fail] = true
+  end
+
   options[:debug_level] = DebugLevels::WARN
   opts.on('-d', '--debug-level NONE|WARN|ERR', 'Set the debug level') do |level|
     case level

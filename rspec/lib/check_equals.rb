@@ -1,7 +1,8 @@
 class Equals
-  def self.check_equals
+  def self.check_equals(pass_or_fail = false)
     should_eq_eq = %x{find . -name '*_spec.rb' -exec grep -nE "(:?should|should_not) (:?==|!=)" /dev/null {} \\;}
     return true if(should_eq_eq == '')
+    return false if(should_eq_eq != '' && pass_or_fail == true)
     if(should_eq_eq)
       puts "\tYou're using \"==\" instead of \"eq()\""
       puts "\tThis is bad design."
