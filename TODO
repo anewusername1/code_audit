@@ -1,0 +1,4 @@
+check_shoulds() {
+  ack "empty\?.should be_true"
+  ack "empty\?.should be_false"
+}

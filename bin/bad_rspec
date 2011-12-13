@@ -4,17 +4,6 @@ check_dependencies(){
   hash perl 2>&- || { echo >&2 "I require perl but it's not installed.  Aborting."; exit 1; }
 }
 
-# TODO: check that we're in a git repository. Warn and prompt to continue if we aren't
-# TODO: make this tell you when it found bad rspec code, what the code is, and prompt the user
-# with options to (r)eplace, r(e)view, (o)verwrite, (i)gnore
-# check_shoulds() {
-  # ack "empty\?.should be_true"
-  # ack "empty\?.should be_false"
-  # ack "should == "
-  # ack "should_not == "
-  # ack "should != "
-# }
-
 get_user_action() {
   echo "\n\n\tWhat would you like to do to this issue? (works for 99% of the cases)\n\t\t(r)eplace, r(e)view, (i)gnore, (q)uit"
   read -n 1 answer
